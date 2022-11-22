@@ -3,6 +3,7 @@ import 'package:english_cards12/models/englishtoday.dart';
 import 'package:english_cards12/values/app_asset.dart';
 import 'package:english_cards12/values/app_colors.dart';
 import 'package:english_cards12/values/app_style.dart';
+import 'package:english_words/english_words.dart';
 import 'package:flutter/material.dart';
 
 class HomePage extends StatefulWidget {
@@ -14,26 +15,43 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int curentIndex = 0;
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
 
   List<EnglishToday> words = [];
 
   List<int> flixedListRandom ({int len = 1,int max = 120, int min = 1}) {
-    if(len  > max || len < min)
+    if(len  > max || len < min){
       return [];
-  }
-  List<int> newList = [];
-  Random random = Random();
-  int count = 1;
-  while ( count <= len) {
+    }
+
+    List<int> newList = [];
+    Random random = Random();
+    int count = 1;
+    while ( count <= len) {
     int val = random.nextInt(max);
     if (newList.contains(val)){
-  continue;
-  }
-    else {(newList.add(val));
-    count++;
+      continue;
+    } else {(newList.add(val));
+      count++;
     }
+    }
+    return newList;
+    }
+
+    getEnglishToday(){
+    List<String> newList = [];
+    List<int> rans = flixedListRandom(len: 5, max: nouns.length);
+    rans.forEach((index) {newList.add(nouns[index]);});
+    words = newList.map((e) => EnglishToday(
+      noun: e,
+    )).toList();
+    }
+  @override
+  void initState(){
+    getEnglishToday();
+    super.initState();
   }
+
 
   @override
   Widget build(BuildContext context) {
@@ -58,7 +76,7 @@ class _HomePageState extends State<HomePage> {
             child: Column(
               children: [
                 Container(
-                    height: size.height * 1 / 10,
+                    height: size.height * 1 / 9,
                     alignment: Alignment.centerLeft,
                     padding: const EdgeInsets.all(16),
                     child: Text(
@@ -74,10 +92,15 @@ class _HomePageState extends State<HomePage> {
                       setState((){
                         curentIndex = index;
                       });},
-                      itemCount: 5,
+                      itemCount: words.length,
                       itemBuilder: (context, index) {
+                      String firstLetter = words[index].noun != null ? words[index].noun! : '' ;
+                          firstLetter = firstLetter.substring(0, 1);
+                      String leftLetter = words[index].noun != null ? words[index].noun! : '' ;
+                      firstLetter = firstLetter.substring(1, leftLetter.length);
+
                         return Container(
-                          decoration: BoxDecoration(
+                          decoration: const BoxDecoration(
                             color: AppColors.backgroundColor,
                             borderRadius: BorderRadius.all(Radius.circular(20)),
                           ),
@@ -92,8 +115,8 @@ class _HomePageState extends State<HomePage> {
                                   maxLines: 1,
                                   overflow: TextOverflow.ellipsis,
                                   textAlign: TextAlign.start,
-                                  text: const TextSpan(
-                                      text: 'B',
+                                  text:  TextSpan(
+                                      text: firstLetter,
                                       style: TextStyle(
                                           fontSize: 96,
                                           fontFamily: 'sen',
@@ -105,7 +128,7 @@ class _HomePageState extends State<HomePage> {
                                           )
                                           ]
                                       ),
-                                      children: [TextSpan(text: 'eautiful',
+                                      children: [TextSpan(text: leftLetter,
                                           style: TextStyle(
                                               fontSize: 64,
                                               fontFamily: 'sen',
